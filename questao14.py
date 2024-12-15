@@ -34,13 +34,13 @@ class ArvoreBinaria:
             return self._buscar_no_node(self.root, valor)
 
     def _buscar_no_node(self, node_atual, valor):
+        if node_atual is None:
+            return False
         if valor == node_atual.valor:
             return True
-        if valor < node_atual.valor and node_atual.left is not None:
-            return self._buscar_no_node(valor, node_atual.left)
-        if valor > node_atual.valor and node_atual.right is not None:
-            return self._buscar_no_node(valor, node_atual.right)
-        return False
+        if valor < node_atual.valor:
+            return self._buscar_no_node(node_atual.left, valor)
+        return self._buscar_no_node(node_atual.right, valor)
 
     def remover(self, valor):
         if self.root is not None:
@@ -61,13 +61,31 @@ class ArvoreBinaria:
             if node_atual.right is None:
                 return node_atual.left
 
-            node_atual.valor = self._menor(node_atual.right)
-            node_atual.right = self._remover(node_atual.valor, node_atual.right)
+            menor_valor = self._menor(node_atual.right)
+            node_atual.valor = menor_valor
+            node_atual.right = self._remover(menor_valor, node_atual.right)
         return node_atual
 
     def _menor(self, node):
-        if node.left is not None:
-            node= node.left
-        else:
-            return self
+        atual = node
+        while atual.left is not None:
+            atual = atual.left
+        return atual.valor
 
+
+def questao14():
+    arvore = ArvoreBinaria()
+    arvore.add(100)
+    arvore.add(50)
+    arvore.add(150)
+    arvore.add(30)
+    arvore.add(70)
+    arvore.add(130)
+    arvore.add(170)
+    print("O valor 70 está na árvore:", arvore.buscar(70))
+    print("Removendo 70...")
+    arvore.remover(70)
+    print("O valor 70 está na árvore após a remoção:", arvore.buscar(70))
+
+
+questao14()

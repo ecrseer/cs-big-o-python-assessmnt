@@ -1,73 +1,53 @@
-class Node:
-    def __init__(self, valor):
-        self.valor = valor
-        self.left = None
-        self.right = None
+def permutar_maximo_valor(capacidade_mochila, pesos, valores, qtd, memo):
+
+    if qtd == 0 or capacidade_mochila == 0:
+        return 0
+
+    if (qtd, capacidade_mochila) in memo:
+        return memo[(qtd, capacidade_mochila)]
 
 
-class ArvoreBinaria:
-    def __init__(self):
-        self.root = None
+    if pesos[qtd - 1] > capacidade_mochila:
+        resultado = permutar_maximo_valor(
+            capacidade_mochila, pesos, valores, qtd - 1, memo
+        )
+    else:
+        proximos_itens=permutar_maximo_valor(
+            capacidade_mochila - pesos[qtd - 1],
+            pesos,
+            valores,
+            qtd - 1,
+            memo,
+            )
+        valor_com_item = (
+                valores[qtd - 1]
+                + proximos_itens
+        )
+        valor_sem_item = permutar_maximo_valor(
+            capacidade_mochila, pesos, valores, qtd - 1, memo
+        )
+        resultado = max(valor_com_item, valor_sem_item)
 
-    def add(self, valor):
-        if self.root is None:
-            self.root = Node(valor)
-        else:
-            self._add_no_node(valor, self.root)
 
-    def _add_no_node(self, valor, node):
-        if valor < node.valor:
-            if node.left is None:
-                node.left = Node(valor)
-            else:
-                self._add_no_node(valor, node.left)
-        else:
-            if node.right is None:
-                node.right = Node(valor)
-            else:
-                self._add_no_node(valor, node.right)
+    memo[(qtd, capacidade_mochila)] = resultado
+    return resultado
 
-    def buscar(self, valor):
-        if self.root is None:
-            return False
-        else:
-            return self._buscar_no_node(self.root, valor)
 
-    def _buscar_no_node(self, node_atual, valor):
-        if valor == node_atual.valor:
-            return True
-        if valor < node_atual.valor and node_atual.left is not None:
-            return self._buscar_no_node(valor, node_atual.left)
-        if valor > node_atual.valor and node_atual.right is not None:
-            return self._buscar_no_node(valor, node_atual.right)
-        return False
 
-    def remover(self, valor):
-        if self.root is not None:
-            self.root = self._remover(valor, self.root)
+def questao13():
+    valores_dos_itens = [6, 5, 40]
+    pesos_dos_itens = [10, 20, 40]
+    capacidade_total = 50
+    quantidade_de_itens = len(valores_dos_itens)
 
-    def _remover(self, valor, node_atual):
-        if node_atual is None:
-            return node_atual
-        if valor < node_atual.valor:
-            node_atual.left = self._remover(valor, node_atual.left)
-        elif valor > node_atual.valor:
-            node_atual.right = self._remover(valor, node_atual.right)
-        else:
-            if node_atual.left is None and node_atual.right is None:
-                return None
-            if node_atual.left is None:
-                return node_atual.right
-            if node_atual.right is None:
-                return node_atual.left
 
-            node_atual.valor = self._menor(node_atual.right)
-            node_atual.right = self._remover(node_atual.valor, node_atual.right)
-        return node_atual
+    memoizacao = {}
 
-    def _menor(self, node):
-        if node.left is not None:
-            node= node.left
-        else:
-            return self
 
+    valor_maximo = permutar_maximo_valor(
+        capacidade_total, pesos_dos_itens, valores_dos_itens, quantidade_de_itens, memoizacao
+    )
+
+    print(f"O valor máximo que pode ser carregado na mochila é: {valor_maximo}")
+
+questao13()
